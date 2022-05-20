@@ -15,15 +15,26 @@ class ApiAuthController extends Controller
     //
 
     public function register (Request $request) {
+        
         $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:255',
+            'first_name' => 'required|string|max:255|min:3',
+            'last_name' => 'required|string|max:255|min:3',
+            'country' => 'string|max:255|min:3',
+            'speciality'=> 'required|string|max:255',
+            'phone'=> 'required|string|max:255|min:3',
+            'governorate'=> 'required|string|max:255', 
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:6|confirmed',
+            
+            'address' => 'required|string|max:255|min:3',
+            
         ]);
         if ($validator->fails())
         {
             return response(['errors'=>$validator->errors()->all()], 422);
         }
+        
+       
         $request['password']=Hash::make($request['password']);
         $request['remember_token'] = Str::random(10);
         $user = User::create($request->toArray());
