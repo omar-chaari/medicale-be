@@ -17,28 +17,6 @@ class SearchController extends Controller
 
     public function search(Request $request)
     {
-
-
-
-        /*$validator = Validator::make($request->all(), [
-            'first_name' => 'required|string|max:255|min:3',
-            'last_name' => 'required|string|max:255|min:3',
-            'country' => 'string|max:255|min:3',
-            'speciality'=> 'required|string|max:255',
-            'phone'=> 'required|string|max:255|min:3',
-            'governorate'=> 'required|string|max:255', 
-            'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:6|confirmed',
-            
-            'address' => 'required|string|max:255|min:3',
-            
-        ]);
-        if ($validator->fails())
-        {
-            return response(['errors'=>$validator->errors()->all()], 422);
-        }
-        */
-
         $page = $request->page ? $request->page : 1;
         $results_per_page = $request->results_per_page ? $request->results_per_page : -1;
         $tableID = $request->tableID;
@@ -56,11 +34,7 @@ class SearchController extends Controller
             "totalItems" => $totalItems,
 
         );
-        /*$request['password'] = Hash::make($request['password']);
-        $request['remember_token'] = Str::random(10);
-        $user = User::create($request->toArray());
-        $token = $user->createToken('Laravel Password Grant Client')->accessToken;
-        $response = ['token' => $token];*/
+
         return response($response, 200);
     }
 
@@ -69,14 +43,9 @@ class SearchController extends Controller
 
 
 
-        // build the base query for customer and group ...
         if ($fields != '')
             $query = "SELECT $fields  FROM $tableID ";
         else $query = "SELECT SQL_CALC_FOUND_ROWS * FROM $tableID ";
-
-
-        //---
-
         $search_where = "";
         $fields_array = explode(",", $fields);
 
