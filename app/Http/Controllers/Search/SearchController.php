@@ -40,7 +40,7 @@ class SearchController extends Controller
         */
 
         $page = $request->page ? $request->page : 1;
-        $results_per_page = $request->results_per_page ? $request->results_per_page : 10;
+        $results_per_page = $request->results_per_page ? $request->results_per_page : -1;
         $tableID = $request->tableID;
         $where = $request->where ? $request->where : "";
         $fields = $request->fields;

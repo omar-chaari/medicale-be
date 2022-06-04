@@ -13,14 +13,10 @@ class SearchTest extends TestCase
      *
      * @return void
      */
-    public function test_register()
+    public function test_search()
     {
-        //$app_url = env('APP_URL');
-        ////post
-       /*
-       name, email (which has to be unique), password, and password_confirmation
-       */
-        $route=route('search.api',["tableID" => "users"
+      //speciality //users
+        $route=route('search.api',["tableID" => "speciality"
 
     ]);
         $response = $this->json('GET', $route);
