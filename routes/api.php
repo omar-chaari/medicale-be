@@ -34,8 +34,10 @@ Route::group(['middleware' => ['cors', 'json.response']], function () {
     Route::post('/register',[ApiAuthController::class, 'register'])->name('register.api');
     Route::get('/search',[SearchController::class, 'search'])->name('search.api');
 
+    Route::get('/search-medecin',[SearchController::class, 'searchMedecin'])->name('searchmedecin.api');
     //Route::post('/logout', 'Auth\ApiAuthController@logout')->name('logout.api');
 
     // ...
+    //searchMedecin
 
 });

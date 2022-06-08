@@ -132,4 +132,63 @@ class SearchController extends Controller
 
         return $totalrows;
     }
+
+    public function searchMedecin(Request $request)
+    {
+
+        $page = $request->page ? $request->page : 1;
+        $results_per_page = $request->results_per_page ? $request->results_per_page : -1;
+        $order_by = $request->order_by ? $request->order_by : "";
+        $gouvernorat = $request->gouvernorat ? $request->gouvernorat : "";
+        $speciality = $request->speciality ? $request->speciality : "";
+        $name = $request->name ? $request->name : "";
+
+        $result = $this->getTableListMedecin($page, $results_per_page, $order_by, $gouvernorat, $speciality, $name);
+        $totalItems = $this->getTotalItemsMedecin($gouvernorat, $speciality, $name);
+        $response = array(
+            "data" => $result,
+            "totalItems" => $totalItems,
+
+        );
+
+        return response($response, 200);
+    }
+    function getTableListMedecin($page = 1, $limit = -1, $order_by, $gouvernorat, $speciality, $name)
+    {
+
+
+
+        $results_per_page = $limit;
+        $page_first_result = ($page - 1) * $results_per_page;
+
+      
+        $users = DB::table('users')
+            ->leftJoin('governorate', 'users.governorate', '=', 'governorate.id')
+            ->leftJoin('speciality', 'users.speciality', '=', 'speciality.id')
+
+
+
+            ->where(function ($q) use ($gouvernorat, $speciality) {
+                $q->where('governorate.governorate', 'LIKE', "%$gouvernorat%")
+                    ->where('speciality.speciality', 'LIKE', "%$speciality%");
+            })
+            ->skip($page_first_result)->take($results_per_page)
+            ->get();
+
+        return $users;
+    }
+
+    function getTotalItemsMedecin($gouvernorat, $speciality, $name)
+    {
+
+
+        $users = DB::table('users')
+            ->leftJoin('governorate', 'users.governorate', '=', 'governorate.id')
+            ->leftJoin('speciality', 'users.speciality', '=', 'speciality.id')
+
+            ->get();
+        $totalrows = count($users);
+
+        return $totalrows;
+    }
 }
