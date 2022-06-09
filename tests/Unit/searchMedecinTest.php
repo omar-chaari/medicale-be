@@ -15,9 +15,14 @@ class SearchMedecinTest extends TestCase
      */
     public function test_searchmedecin()
     {
-      //speciality //users
-        $route=route('searchmedecin.api',["gouvernorat" => "Beja",
-        "speciality" => "Cardiologue"
+      //speciality //users ,"page"=>1,"limit"=>10
+        $route=route('searchmedecin.api',["gouvernorat" => "",
+        "speciality" => "Cardiologue",
+        
+        "name" => "first_name2",
+        
+        
+
 
     ]);
         $response = $this->json('GET', $route);
@@ -25,7 +30,7 @@ class SearchMedecinTest extends TestCase
         
 
         $content = json_decode($response->getContent());
-        //dd($content);
+
         $response->assertStatus(200);
     }
 }

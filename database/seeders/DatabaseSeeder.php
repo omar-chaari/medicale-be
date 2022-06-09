@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use DB;
+use Illuminate\Support\Facades\Hash;
 
 class DatabaseSeeder extends Seeder
 {
@@ -15,6 +16,7 @@ class DatabaseSeeder extends Seeder
    */
   public function run()
   {
+    DB::table('users')->delete();
 
     DB::table('speciality')->delete();
     DB::table('speciality')->insert(array(
@@ -51,5 +53,18 @@ class DatabaseSeeder extends Seeder
       array('id' => 23, 'governorate' => 'Tunis'),
       array('id' => 24, 'governorate' => 'Zaghouan'),
     ));
+
+    DB::table('users')->delete();
+    for ($i = 0; $i < 100; $i++) {
+      $password="TestTest$i";
+      $password=Hash::make($password);
+      DB::table('users')->insert(array(
+        array('email' => "test$i@test.com", 'password' => "$password",
+      "first_name"=>"first_name$i","last_name"=>"last_name$i","speciality"=>13,
+      "governorate"=>18,"address"=>"addresse$i","phone"=>"20202020"
+    ),
+       
+      ));
+    }
   }
 }

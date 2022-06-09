@@ -137,7 +137,7 @@ class SearchController extends Controller
     {
 
         $page = $request->page ? $request->page : 1;
-        $results_per_page = $request->results_per_page ? $request->results_per_page : -1;
+        $results_per_page = $request->results_per_page ? $request->results_per_page : 10;
         $order_by = $request->order_by ? $request->order_by : "";
         $gouvernorat = $request->gouvernorat ? $request->gouvernorat : "";
         $speciality = $request->speciality ? $request->speciality : "";
@@ -157,24 +157,29 @@ class SearchController extends Controller
     {
 
 
-
+        $limit=10;
         $results_per_page = $limit;
         $page_first_result = ($page - 1) * $results_per_page;
 
-      
         $users = DB::table('users')
             ->leftJoin('governorate', 'users.governorate', '=', 'governorate.id')
             ->leftJoin('speciality', 'users.speciality', '=', 'speciality.id')
 
 
 
-            ->where(function ($q) use ($gouvernorat, $speciality) {
+            ->where(function ($q) use ($gouvernorat, $speciality, $name) {
                 $q->where('governorate.governorate', 'LIKE', "%$gouvernorat%")
-                    ->where('speciality.speciality', 'LIKE', "%$speciality%");
+                    ->where('speciality.speciality', 'LIKE', "%$speciality%")
+                    ->where('speciality.speciality', 'LIKE', "%$speciality%")
+                    ->where(function ($query) use ($name) {
+                        $query->where('users.first_name', 'LIKE', "%$name%")
+                            ->orWhere('users.first_name', 'LIKE', "%$name%");
+                    });
             })
-            ->skip($page_first_result)->take($results_per_page)
-            ->get();
 
+            ->offset($page_first_result)
+            ->limit($results_per_page)
+            ->get();
         return $users;
     }
 
