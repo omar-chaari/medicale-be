@@ -157,7 +157,7 @@ class SearchController extends Controller
     {
 
 
-        $limit=10;
+        $limit=8;
         $results_per_page = $limit;
         $page_first_result = ($page - 1) * $results_per_page;
 
@@ -173,7 +173,7 @@ class SearchController extends Controller
                     ->where('speciality.speciality', 'LIKE', "%$speciality%")
                     ->where(function ($query) use ($name) {
                         $query->where('users.first_name', 'LIKE', "%$name%")
-                            ->orWhere('users.first_name', 'LIKE', "%$name%");
+                            ->orWhere('users.last_name', 'LIKE', "%$name%");
                     });
             })
 
