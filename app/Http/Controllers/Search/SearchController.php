@@ -137,7 +137,7 @@ class SearchController extends Controller
     {
 
         $page = $request->page ? $request->page : 1;
-        $results_per_page = $request->results_per_page ? $request->results_per_page : 10;
+        $results_per_page = $request->results_per_page ? $request->results_per_page : 8;
         $order_by = $request->order_by ? $request->order_by : "";
         $gouvernorat = $request->gouvernorat ? $request->gouvernorat : "";
         $speciality = $request->speciality ? $request->speciality : "";
