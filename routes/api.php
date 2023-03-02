@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\ApiAuthController;
+use App\Http\Controllers\Auth\AdminAuthController;
 use App\Http\Controllers\Search\SearchController;
 
 
@@ -39,5 +40,9 @@ Route::group(['middleware' => ['cors', 'json.response']], function () {
 
     // ...
     //searchMedecin
+
+    Route::post('/login-admin',   [AdminAuthController::class, 'login'])->name('login.api');
+    Route::post('/register-admin',[AdminAuthController::class, 'register'])->name('register.api');
+
 
 });
