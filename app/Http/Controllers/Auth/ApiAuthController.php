@@ -15,6 +15,7 @@ class ApiAuthController extends Controller
 {
     //
 
+    //register profetionel de santé
     public function register (Request $request) {
         
         $validator = Validator::make($request->all(), [

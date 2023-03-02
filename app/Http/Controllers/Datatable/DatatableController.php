@@ -86,4 +86,48 @@ class DatatableController extends Controller
             return ['status' => false, 'message' => $e->getMessage()];
         }
     }
+
+    public function delete(Request $request)
+    {
+
+
+        $table = $request->table;
+        $where = $request->where ? $this->multipleConditionQuery($request->where) : "";
+
+        if ($where == "")
+            return response(array(
+                "message" => "invalid where parametre",
+            ), 400);
+
+        DB::delete("delete from $table where $where");
+
+        $return = array(
+            "message" => "Record Removed Successfully.",
+
+        );
+        return response($return, 200);
+    }
+
+    private function multipleConditionQuery($where)
+    {
+        //$where = str_replace("'", '"', $where);
+        $string_where = "";
+
+        $array_where_multiple = $where;
+        $array_where_condition_multiple = [];
+
+
+
+        if (is_array($array_where_multiple))
+            foreach ($array_where_multiple as $object_where_simple) {
+                $array_where_condition_simple = [];
+                if (is_array($object_where_simple))
+                    foreach ($object_where_simple as $key => $value) {
+                        $array_where_condition_simple[] = $key . "='$value'";
+                    }
+                $array_where_condition_multiple[] = "(" . implode(" AND ", $array_where_condition_simple) . ")";
+            }
+        $string_where_multiple = implode(" OR ", $array_where_condition_multiple);
+        return $string_where_multiple;
+    }
 }

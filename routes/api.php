@@ -47,6 +47,7 @@ Route::group(['middleware' => ['cors', 'json.response']], function () {
     Route::post('/register-admin',[AdminAuthController::class, 'register'])->name('register-admin.api');
 
     Route::post('/update-datatable',[DatatableController::class, 'update'])->name('update-datatable.api');
-
+	//delete-datatable
+	Route::delete('/delete-datatable',[DatatableController::class, 'delete'])->name('delete-datatable.api');
 
 });
