@@ -3,10 +3,12 @@
 namespace App\Http\Controllers\Datatable;
 
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 
 use DB;
+use Illuminate\Support\Facades\Mail;
 
 class DatatableController extends Controller
 {
@@ -17,11 +19,13 @@ class DatatableController extends Controller
         $table = $request->table;
         $data = (array) $request->data;
 
-        return   $this->processUpdate($table, $data);
+        $cmd = $request->cmd ? $request->cmd : "";
+
+        return   $this->processUpdate($table, $data, $cmd);
     }
 
 
-    private function processUpdate(string $table, array $data)
+    private function processUpdate(string $table, array $data, string $cmd)
     {
         try {
 
@@ -78,6 +82,11 @@ class DatatableController extends Controller
             //commit transaction
             DB::commit();
 
+            if ($cmd = "email_verif_professional") {
+                $professional = User::find($data["keys"]["id"]);
+             
+                $this->emailVerifProfessional($professional);
+            }
             return ['status' => true, 'message' => 'Data modified successfully.'];
         } catch (\Exception $e) {
             DB::rollback();
@@ -129,5 +138,58 @@ class DatatableController extends Controller
             }
         $string_where_multiple = implode(" OR ", $array_where_condition_multiple);
         return $string_where_multiple;
+    }
+    public function insert(Request $request)
+    {
+        $table = $request->table;
+        $data = (array) $request->data;
+
+        return   $this->processInsert($table, $data);
+    }
+
+
+    private function processInsert(string $table, array $data)
+    {
+
+
+        $sql = "";
+        foreach ($data["form_data"] as $key => $value) {
+            if ($sql != "")
+                $sql .= ",";
+
+            $sql .= "`$key`='$value'";
+        }
+
+
+
+        try {
+            $query = "INSERT INTO $table SET $sql;";
+            DB::insert($query);
+            return ['status' => true, 'message' => 'Data modified successfully.'];
+        } catch (\Illuminate\Database\QueryException $ex) {
+            $error_message = $ex->getMessage();
+            $pos = strpos($error_message, "Duplicate entry");
+            if ($pos > 0)
+                return ['status' => false, 'message' => 'Duplicate entry'];
+            return ['status' => false, 'message' => $error_message];
+        }
+    }
+
+    
+    public function emailVerifProfessional($data)
+    {
+
+        $details = [
+            'first_name' => $data->first_name,
+            'last_name' => $data->last_name,
+
+            'email' => $data->email,
+            'speciality' => $data->specialitylist->speciality,
+            'governorate' => $data->governoratelist->governorate,
+            'phone' => $data->phone,
+
+        ];
+
+        Mail::to($data->email)->send(new \App\Notifications\Contact($details));
     }
 }

@@ -7,6 +7,9 @@ use App\Http\Controllers\Auth\AdminAuthController;
 use App\Http\Controllers\Search\SearchController;
 use App\Http\Controllers\datatable\DatatableController;
 use App\Http\Controllers\Auth\PatientAuthController;
+use App\Http\Controllers\DocumentController;
+
+
 
 
 
@@ -48,10 +51,14 @@ Route::group(['middleware' => ['cors', 'json.response']], function () {
     Route::post('/register-admin',[AdminAuthController::class, 'register'])->name('register-admin.api');
 
     Route::post('/update-datatable',[DatatableController::class, 'update'])->name('update-datatable.api');
-	//
+    Route::post('/insert-datatable',[DatatableController::class, 'insert'])->name('insert-datatable.api');
+
+    //
 	Route::delete('/delete-datatable',[DatatableController::class, 'delete'])->name('delete-datatable.api');
 
     Route::post('/login-patient',   [PatientAuthController::class, 'login'])->name('login-patient.api');
     Route::post('/register-patient',[PatientAuthController::class, 'register'])->name('register-patient.api');
+
+    Route::post('/document-store',[DocumentController::class, 'documentStore'])->name('document-store.api');
 
 });

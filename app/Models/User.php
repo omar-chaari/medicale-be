@@ -49,11 +49,11 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
-    public function speciality()
+    public function specialitylist()
 	{
 		return $this->belongsTo('App\Models\Speciality', 'speciality', 'id');
 	}
-    public function governorate()
+    public function governoratelist()
 	{
 		return $this->belongsTo('App\Models\Governorate', 'governorate', 'id');
 	}
