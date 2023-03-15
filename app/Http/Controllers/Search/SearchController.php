@@ -162,15 +162,15 @@ class SearchController extends Controller
         $page_first_result = ($page - 1) * $results_per_page;
 
         $users = DB::table('users')
-            ->leftJoin('governorate', 'users.governorate', '=', 'governorate.id')
-            ->leftJoin('speciality', 'users.speciality', '=', 'speciality.id')
+            ->leftJoin('governorates', 'users.governorate', '=', 'governorates.id')
+            ->leftJoin('specialities', 'users.speciality', '=', 'specialities.id')
 
 
 
             ->where(function ($q) use ($gouvernorat, $speciality, $name) {
-                $q->where('governorate.governorate', 'LIKE', "%$gouvernorat%")
-                    ->where('speciality.speciality', 'LIKE', "%$speciality%")
-                    ->where('speciality.speciality', 'LIKE', "%$speciality%")
+                $q->where('governorates.governorate', 'LIKE', "%$gouvernorat%")
+                    ->where('specialities.speciality', 'LIKE', "%$speciality%")
+                    ->where('specialities.speciality', 'LIKE', "%$speciality%")
                     ->where(function ($query) use ($name) {
                         $query->where('users.first_name', 'LIKE', "%$name%")
                             ->orWhere('users.last_name', 'LIKE', "%$name%");
@@ -188,8 +188,8 @@ class SearchController extends Controller
 
 
         $users = DB::table('users')
-            ->leftJoin('governorate', 'users.governorate', '=', 'governorate.id')
-            ->leftJoin('speciality', 'users.speciality', '=', 'speciality.id')
+            ->leftJoin('governorates', 'users.governorate', '=', 'governorates.id')
+            ->leftJoin('specialities', 'users.speciality', '=', 'specialities.id')
 
             ->get();
         $totalrows = count($users);

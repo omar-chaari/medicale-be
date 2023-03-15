@@ -33,19 +33,11 @@ Route::group(['middleware' => ['cors', 'json.response']], function () {
 
     // ...
 
-    // public routes
-    /*
-    [AuthController::class, 'getLogin']
-    */
     Route::post('/login',   [ApiAuthController::class, 'login'])->name('login.api');
     Route::post('/register',[ApiAuthController::class, 'register'])->name('register.api');
     Route::get('/search',[SearchController::class, 'search'])->name('search.api');
 
     Route::get('/search-medecin',[SearchController::class, 'searchMedecin'])->name('searchmedecin.api');
-    //Route::post('/logout', 'Auth\ApiAuthController@logout')->name('logout.api');
-
-    // ...
-    //searchMedecin
 
     Route::post('/login-admin',   [AdminAuthController::class, 'login'])->name('login-admin.api');
     Route::post('/register-admin',[AdminAuthController::class, 'register'])->name('register-admin.api');
