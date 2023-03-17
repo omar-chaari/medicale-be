@@ -136,14 +136,15 @@ class SearchController extends Controller
     public function searchMedecin(Request $request)
     {
 
-        $page = $request->page ? $request->page : 1;
-        $results_per_page = $request->results_per_page ? $request->results_per_page : 8;
+
+        $offset = $request->offset ? $request->offset : 0;
+        $limit = $request->limit ? $request->limit : 10;
         $order_by = $request->order_by ? $request->order_by : "";
         $gouvernorat = $request->gouvernorat ? $request->gouvernorat : "";
         $speciality = $request->speciality ? $request->speciality : "";
         $name = $request->name ? $request->name : "";
 
-        $result = $this->getTableListMedecin($page, $results_per_page, $order_by, $gouvernorat, $speciality, $name);
+        $result = $this->getTableListMedecin($offset, $limit, $order_by, $gouvernorat, $speciality, $name);
         $totalItems = $this->getTotalItemsMedecin($gouvernorat, $speciality, $name);
         $response = array(
             "data" => $result,
@@ -153,13 +154,12 @@ class SearchController extends Controller
 
         return response($response, 200);
     }
-    function getTableListMedecin($page = 1, $limit = -1, $order_by, $gouvernorat, $speciality, $name)
+    function getTableListMedecin($offset = 0, $limit = -1, $order_by, $gouvernorat, $speciality, $name)
     {
 
 
-        $limit=8;
-        $results_per_page = $limit;
-        $page_first_result = ($page - 1) * $results_per_page;
+     //   $results_per_page = $limit;
+      //  $page_first_result = ($page - 1) * $results_per_page;
 
         $users = DB::table('users')
             ->leftJoin('governorates', 'users.governorate', '=', 'governorates.id')
@@ -177,8 +177,8 @@ class SearchController extends Controller
                     });
             })
 
-            ->offset($page_first_result)
-            ->limit($results_per_page)
+            ->offset($offset)
+            ->limit($limit)
             ->get();
         return $users;
     }
