@@ -158,10 +158,30 @@ class SearchController extends Controller
     {
 
 
-     //   $results_per_page = $limit;
-      //  $page_first_result = ($page - 1) * $results_per_page;
+        //   $results_per_page = $limit;
+        //  $page_first_result = ($page - 1) * $results_per_page;
 
+        /*
+        "email": "zaier-ahmed-10@gmail.com",
+"email_verified_at": null,
+"password": "$2y$10$7V16woTg.108uWR41iTRA.detwjDZwH2ytb0GLfuIMcVZ24Kc2rhW",
+"remember_token": null,
+"created_at": null,
+"updated_at": null,
+"first_name": "Ahmed",
+"last_name": "Zaier",
+"country": null,
+"speciality": "Chirurgien Esthétique",
+"governorate": "Bizerte",
+"address": "18 Boulevard Mohamed V",
+"phone": "27133542",
+"verification": "1"
+
+        */
         $users = DB::table('users')
+            ->select('email', 'first_name' , 'specialities.speciality',
+             'governorates.governorate', 'address' , 'phone'  )
+
             ->leftJoin('governorates', 'users.governorate', '=', 'governorates.id')
             ->leftJoin('specialities', 'users.speciality', '=', 'specialities.id')
 
