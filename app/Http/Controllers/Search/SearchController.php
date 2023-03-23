@@ -179,7 +179,7 @@ class SearchController extends Controller
 
         */
         $users = DB::table('users')
-            ->select('email', 'first_name' , 'specialities.speciality',
+            ->select('email', 'first_name', 'last_name' , 'specialities.speciality',
              'governorates.governorate', 'address' , 'phone'  )
 
             ->leftJoin('governorates', 'users.governorate', '=', 'governorates.id')
