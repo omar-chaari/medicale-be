@@ -137,15 +137,17 @@ class SearchController extends Controller
     {
 
 
+       
         $offset = $request->offset ? $request->offset : 0;
         $limit = $request->limit ? $request->limit : 10;
         $order_by = $request->order_by ? $request->order_by : "";
         $gouvernorat = $request->gouvernorat ? $request->gouvernorat : "";
         $speciality = $request->speciality ? $request->speciality : "";
         $name = $request->name ? $request->name : "";
-
-        $result = $this->getTableListMedecin($offset, $limit, $order_by, $gouvernorat, $speciality, $name);
-        $totalItems = $this->getTotalItemsMedecin($gouvernorat, $speciality, $name);
+        $verification = ($request->verification!=="") ? $request->verification : "";
+      
+        $result = $this->getTableListMedecin($offset, $limit, $order_by, $gouvernorat, $speciality, $name, $verification);
+        $totalItems = $this->getTotalItemsMedecin($gouvernorat, $speciality, $name, $verification);
         $response = array(
             "data" => $result,
             "totalItems" => $totalItems,
@@ -154,43 +156,34 @@ class SearchController extends Controller
 
         return response($response, 200);
     }
-    function getTableListMedecin($offset = 0, $limit = -1, $order_by, $gouvernorat, $speciality, $name)
+    function getTableListMedecin($offset = 0, $limit = -1, $order_by, $gouvernorat, $speciality, $name, $verification)
     {
 
 
-        //   $results_per_page = $limit;
-        //  $page_first_result = ($page - 1) * $results_per_page;
 
-        /*
-        "email": "zaier-ahmed-10@gmail.com",
-"email_verified_at": null,
-"password": "$2y$10$7V16woTg.108uWR41iTRA.detwjDZwH2ytb0GLfuIMcVZ24Kc2rhW",
-"remember_token": null,
-"created_at": null,
-"updated_at": null,
-"first_name": "Ahmed",
-"last_name": "Zaier",
-"country": null,
-"speciality": "Chirurgien Esthétique",
-"governorate": "Bizerte",
-"address": "18 Boulevard Mohamed V",
-"phone": "27133542",
-"verification": "1"
-
-        */
         $users = DB::table('users')
-            ->select('email', 'first_name', 'last_name' , 'specialities.speciality',
-             'governorates.governorate', 'address' , 'phone'  )
+            ->select(
+                'email',
+                'first_name',
+                'last_name',
+                'specialities.speciality',
+                'governorates.governorate',
+                'address',
+                'phone',
+                'verification'
+            )
 
             ->leftJoin('governorates', 'users.governorate', '=', 'governorates.id')
             ->leftJoin('specialities', 'users.speciality', '=', 'specialities.id')
 
 
 
-            ->where(function ($q) use ($gouvernorat, $speciality, $name) {
+            ->where(function ($q) use ($gouvernorat, $speciality, $name, $verification) {
                 $q->where('governorates.governorate', 'LIKE', "%$gouvernorat%")
                     ->where('specialities.speciality', 'LIKE', "%$speciality%")
                     ->where('specialities.speciality', 'LIKE', "%$speciality%")
+                    ->where('verification', 'LIKE', "%$verification%")
+
                     ->where(function ($query) use ($name) {
                         $query->where('users.first_name', 'LIKE', "%$name%")
                             ->orWhere('users.last_name', 'LIKE', "%$name%");
@@ -200,6 +193,7 @@ class SearchController extends Controller
             ->offset($offset)
             ->limit($limit)
             ->get();
+
         return $users;
     }
 
