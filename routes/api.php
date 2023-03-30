@@ -53,4 +53,9 @@ Route::group(['middleware' => ['cors', 'json.response']], function () {
 
     Route::post('/document-store',[DocumentController::class, 'documentStore'])->name('document-store.api');
 
+    Route::get('/get-pro',[SearchController::class, 'getMedecin'])->name('get-pro.api');
+
+    //
+    Route::get('/show-record',[DatatableController::class, 'showRecord'])->name('show-record.api');
+
 });

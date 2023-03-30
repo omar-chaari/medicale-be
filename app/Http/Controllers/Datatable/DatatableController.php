@@ -192,4 +192,15 @@ class DatatableController extends Controller
 
         Mail::to($data->email)->send(new \App\Notifications\Contact($details));
     }
+
+    public function showRecord(Request $request)
+    {
+        $table = $request->table;
+        $id = $request->id;
+        $record = DB::table($table)
+            ->where("$table.id", "=", $id)
+            ->first();
+
+        return response((array)$record, 200);
+    }
 }

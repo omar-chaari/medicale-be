@@ -144,8 +144,8 @@ class SearchController extends Controller
         $gouvernorat = $request->gouvernorat ? $request->gouvernorat : "";
         $speciality = $request->speciality ? $request->speciality : "";
         $name = $request->name ? $request->name : "";
-        $verification = ($request->verification!=="") ? $request->verification : "";
-      
+        $verification = ($request->verification !== "") ? $request->verification : "";
+
         $result = $this->getTableListMedecin($offset, $limit, $order_by, $gouvernorat, $speciality, $name, $verification);
         $totalItems = $this->getTotalItemsMedecin($gouvernorat, $speciality, $name, $verification);
         $response = array(
@@ -209,5 +209,35 @@ class SearchController extends Controller
         $totalrows = count($users);
 
         return $totalrows;
+    }
+    public function getMedecin(Request $request)
+    {
+
+
+        $id = $request->id;
+        $user = DB::table('users')
+            ->select(
+                'email',
+                'first_name',
+                'last_name',
+                'specialities.speciality',
+                'governorates.governorate',
+                'address',
+                'phone',
+                'verification'
+            )
+
+            ->leftJoin('governorates', 'users.governorate', '=', 'governorates.id')
+            ->leftJoin('specialities', 'users.speciality', '=', 'specialities.id')
+            ->where("users.id", "=", $id)
+
+
+            ->first();
+
+
+
+        return response((array)$user, 200);
+
+        // return response($response, 200);
     }
 }
