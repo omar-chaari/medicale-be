@@ -198,7 +198,7 @@ class SearchController extends Controller
         return $users;
     }
 
-    function getTotalItemsMedecin($gouvernorat, $speciality, $name)
+    function getTotalItemsMedecin($gouvernorat, $speciality, $name,$verification)
     {
 
 
@@ -206,6 +206,17 @@ class SearchController extends Controller
             ->leftJoin('governorates', 'users.governorate', '=', 'governorates.id')
             ->leftJoin('specialities', 'users.speciality', '=', 'specialities.id')
 
+            ->where(function ($q) use ($gouvernorat, $speciality, $name, $verification) {
+                $q->where('governorates.governorate', 'LIKE', "%$gouvernorat%")
+                    ->where('specialities.speciality', 'LIKE', "%$speciality%")
+                    ->where('specialities.speciality', 'LIKE', "%$speciality%")
+                    ->where('verification', 'LIKE', "%$verification%")
+
+                    ->where(function ($query) use ($name) {
+                        $query->where('users.first_name', 'LIKE', "%$name%")
+                            ->orWhere('users.last_name', 'LIKE', "%$name%");
+                    });
+            })
             ->get();
         $totalrows = count($users);
 
