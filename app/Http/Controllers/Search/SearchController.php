@@ -163,6 +163,7 @@ class SearchController extends Controller
 
         $users = DB::table('users')
             ->select(
+                'users.id as id',
                 'email',
                 'first_name',
                 'last_name',
