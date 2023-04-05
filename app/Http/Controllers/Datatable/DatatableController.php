@@ -82,7 +82,7 @@ class DatatableController extends Controller
             //commit transaction
             DB::commit();
 
-            if ($cmd = "email_verif_professional") {
+            if ($cmd === "email_verif_professional") {
                 $professional = User::find($data["keys"]["id"]);
              
                 $this->emailVerifProfessional($professional);

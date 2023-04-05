@@ -137,7 +137,7 @@ class SearchController extends Controller
     {
 
 
-       
+
         $offset = $request->offset ? $request->offset : 0;
         $limit = $request->limit ? $request->limit : 10;
         $order_by = $request->order_by ? $request->order_by : "";
@@ -146,7 +146,15 @@ class SearchController extends Controller
         $name = $request->name ? $request->name : "";
         $verification = ($request->verification !== "") ? $request->verification : "";
 
-        $result = $this->getTableListMedecin($offset, $limit, $order_by, $gouvernorat, $speciality, $name, $verification);
+        $sortColumn = $request->sortColumn ? $request->sortColumn : "first_name";
+
+        $sortOrder = $request->sortOrder ? $request->sortOrder : "asc";
+        $email = $request->email ? $request->email : "";
+
+
+   
+
+        $result = $this->getTableListMedecin($offset, $limit, $order_by, $gouvernorat, $speciality, $name, $verification, $email ,$sortColumn, $sortOrder);
         $totalItems = $this->getTotalItemsMedecin($gouvernorat, $speciality, $name, $verification);
         $response = array(
             "data" => $result,
@@ -156,8 +164,14 @@ class SearchController extends Controller
 
         return response($response, 200);
     }
-    function getTableListMedecin($offset = 0, $limit = -1, $order_by, $gouvernorat, $speciality, $name, $verification)
+    function getTableListMedecin($offset = 0, $limit = -1, $order_by, $gouvernorat, $speciality, $name, $verification,$email, $sortColumn, $sortOrder)
     {
+
+
+
+        if ($sortColumn === "first_name")
+            $sortColumn2 = "last_name";
+        else $sortColumn2 = "users.created_at";
 
 
 
@@ -171,7 +185,8 @@ class SearchController extends Controller
                 'governorates.governorate',
                 'address',
                 'phone',
-                'verification'
+                'verification',
+                'users.created_at as created_at'
             )
 
             ->leftJoin('governorates', 'users.governorate', '=', 'governorates.id')
@@ -179,11 +194,13 @@ class SearchController extends Controller
 
 
 
-            ->where(function ($q) use ($gouvernorat, $speciality, $name, $verification) {
+            ->where(function ($q) use ($gouvernorat, $speciality, $name, $verification,$email) {
                 $q->where('governorates.governorate', 'LIKE', "%$gouvernorat%")
                     ->where('specialities.speciality', 'LIKE', "%$speciality%")
                     ->where('specialities.speciality', 'LIKE', "%$speciality%")
                     ->where('verification', 'LIKE', "%$verification%")
+                    ->where('email', 'LIKE', "%$email%")
+
 
                     ->where(function ($query) use ($name) {
                         $query->where('users.first_name', 'LIKE', "%$name%")
@@ -193,12 +210,14 @@ class SearchController extends Controller
 
             ->offset($offset)
             ->limit($limit)
+            ->orderBy($sortColumn, $sortOrder)
+            ->orderBy($sortColumn2)
             ->get();
 
         return $users;
     }
 
-    function getTotalItemsMedecin($gouvernorat, $speciality, $name,$verification)
+    function getTotalItemsMedecin($gouvernorat, $speciality, $name, $verification)
     {
 
 
