@@ -45,8 +45,7 @@ Route::group(['middleware' => ['cors', 'json.response']], function () {
     Route::post('/update-datatable',[DatatableController::class, 'update'])->name('update-datatable.api');
     Route::post('/insert-datatable',[DatatableController::class, 'insert'])->name('insert-datatable.api');
 
-    //
-	Route::delete('/delete-datatable',[DatatableController::class, 'delete'])->name('delete-datatable.api');
+
 
     Route::post('/login-patient',   [PatientAuthController::class, 'login'])->name('login-patient.api');
     Route::post('/register-patient',[PatientAuthController::class, 'register'])->name('register-patient.api');
@@ -57,5 +56,10 @@ Route::group(['middleware' => ['cors', 'json.response']], function () {
 
     //
     Route::get('/show-record',[DatatableController::class, 'showRecord'])->name('show-record.api');
+
+});
+
+Route::group(['middleware' => ['cors', 'json.response','validateAPIKey']], function () {
+    Route::delete('/delete-datatable',[DatatableController::class, 'delete'])->name('delete-datatable.api');
 
 });

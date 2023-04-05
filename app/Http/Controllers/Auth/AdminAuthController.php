@@ -36,6 +36,8 @@ class AdminAuthController extends Controller
         $user = Admin::create($request->toArray());
         $token = $user->createToken('Laravel Password Grant Client')->accessToken;
         $response = ['token' => $token];
+       
+
         return response($response, 200);
     }
     
@@ -66,10 +68,15 @@ class AdminAuthController extends Controller
 
             $user = Admin::where('email', $request->email)->first();
 
+
+            $token= $user->createToken("API TOKEN")->plainTextToken;
+            $user->api_key = $token;
+            $user->save();
+
             return response()->json([
                 'status' => true,
                 'message' => 'User Logged In Successfully',
-                'token' => $user->createToken("API TOKEN")->plainTextToken
+                'token' => $token
             ], 200);
 
         } catch (\Throwable $th) {
