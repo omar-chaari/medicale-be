@@ -7,7 +7,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
   
-class Contact extends Mailable
+class Inscription extends Mailable
 {
     use Queueable, SerializesModels;
   
@@ -33,7 +33,7 @@ class Contact extends Mailable
 
        // $details=$this->details;
        //,compact('details')
-        return $this->subject('Validation compte professionnel de santé')
+        return $this->subject('Bienvenue sur notre plateforme médicale')
                     ->from('omar.chaari.2021@gmail.com', 'Plateforme médicale')
                     ->view('emails.inscription');
     }
