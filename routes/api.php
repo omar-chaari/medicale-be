@@ -40,26 +40,22 @@ Route::group(['middleware' => ['cors', 'json.response']], function () {
     Route::get('/search-medecin',[SearchController::class, 'searchMedecin'])->name('searchmedecin.api');
 
     Route::post('/login-admin',   [AdminAuthController::class, 'login'])->name('login-admin.api');
-    Route::post('/register-admin',[AdminAuthController::class, 'register'])->name('register-admin.api');
-
-    Route::post('/update-datatable',[DatatableController::class, 'update'])->name('update-datatable.api');
-    Route::post('/insert-datatable',[DatatableController::class, 'insert'])->name('insert-datatable.api');
-
-
-
+    //Route::post('/register-admin',[AdminAuthController::class, 'register'])->name('register-admin.api');
     Route::post('/login-patient',   [PatientAuthController::class, 'login'])->name('login-patient.api');
     Route::post('/register-patient',[PatientAuthController::class, 'register'])->name('register-patient.api');
 
+
+});
+
+Route::group(['middleware' => ['cors', 'json.response','validateAPIKey']], function () {
+    Route::delete('/delete-datatable',[DatatableController::class, 'delete'])->name('delete-datatable.api');
     Route::post('/document-store',[DocumentController::class, 'documentStore'])->name('document-store.api');
 
     Route::get('/get-pro',[SearchController::class, 'getMedecin'])->name('get-pro.api');
 
     //
     Route::get('/show-record',[DatatableController::class, 'showRecord'])->name('show-record.api');
-
-});
-
-Route::group(['middleware' => ['cors', 'json.response','validateAPIKey']], function () {
-    Route::delete('/delete-datatable',[DatatableController::class, 'delete'])->name('delete-datatable.api');
+    Route::post('/update-datatable',[DatatableController::class, 'update'])->name('update-datatable.api');
+    Route::post('/insert-datatable',[DatatableController::class, 'insert'])->name('insert-datatable.api');
 
 });
