@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\ApiAuthController;
 use App\Http\Controllers\Auth\AdminAuthController;
 use App\Http\Controllers\Search\SearchController;
-use App\Http\Controllers\datatable\DatatableController;
+use App\Http\Controllers\Datatable\DatatableController;
 use App\Http\Controllers\Auth\PatientAuthController;
 use App\Http\Controllers\DocumentController;
 
