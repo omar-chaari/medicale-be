@@ -84,7 +84,7 @@ class DatatableController extends Controller
 
             if ($cmd === "email_verif_professional") {
                 $professional = User::find($data["keys"]["id"]);
-             
+
                 $this->emailVerifProfessional($professional);
             }
             return ['status' => true, 'message' => 'Data modified successfully.'];
@@ -175,7 +175,7 @@ class DatatableController extends Controller
         }
     }
 
-    
+
     public function emailVerifProfessional($data)
     {
 
@@ -202,5 +202,99 @@ class DatatableController extends Controller
             ->first();
 
         return response((array)$record, 200);
+    }
+
+
+
+    public function tabledata(Request $request)
+    {
+        $page = $request->page ? $request->page : 1;
+        $results_per_page = $request->results_per_page ? $request->results_per_page : 10;
+        $tableID = $request->tableID;
+        $where = $request->where ? $request->where : "";
+        $fields = $request->fields;
+        $order_by = $request->order_by ? $request->order_by : "";
+        $useFieldsInQuery = $request->useFieldsInQuery ? $request->useFieldsInQuery : 0;
+        $result_table_list = $this->getTableList($tableID, $where, $results_per_page, $page, $fields, $order_by,  $useFieldsInQuery);
+        $totalItems = $this->getTotalItems($tableID, $where, $fields);
+
+
+
+        $response = array(
+            "data" => $result_table_list,
+            "totalItems" => $totalItems
+        );
+        return response($response, 200);
+    }
+    function getTableList($tableID, $where = '', $limit = -1, $page = 1, $fields = "", $order_by = "", $UseFieldsInQuery = 0)
+    {
+
+
+        if ($UseFieldsInQuery)
+            $query = "SELECT $fields FROM $tableID ";
+
+        else $query = "SELECT SQL_CALC_FOUND_ROWS * FROM $tableID ";
+
+        //---
+
+
+
+        // if there is a where clause ... append it
+        if ($where != '')
+            $query .= " WHERE $where ";
+
+        //---
+
+
+        // if the page-size is set ...
+        $results_per_page = $limit;
+        $page_first_result = ($page - 1) * $results_per_page;
+
+        if ($order_by != "")
+            $query .= " ORDER BY  $order_by ";
+
+
+        if ($limit > 0)
+            $query .= 'LIMIT ' . $page_first_result . ',' . $results_per_page;
+        $query .= ';';
+
+        try {
+            $tableList = (array)DB::select($query);
+        } catch (\Illuminate\Database\QueryException $ex) {
+            dd($ex->getMessage());
+            $tableList = [];
+        }
+
+
+        return $tableList;
+    }
+
+    function getTotalItems($tableID, $where = '', $fields = "")
+    {
+
+        // build the base query for customer and group ...
+        $query = "SELECT SQL_CALC_FOUND_ROWS * FROM $tableID ";
+
+        // if there is a where clause ... append it
+        if ($where != '')
+            $query .= " WHERE $where ";
+
+        // if the page-size is set ...
+        $query .= ';';
+
+        // get the list of entities
+
+        try {
+            $tableList = (array)DB::select($query);
+        } catch (\Illuminate\Database\QueryException $ex) {
+            //dd($ex->getMessage());
+            // Note any method of class PDOException can be called on $ex.
+            $tableList = [];
+        }
+
+        // get the actual number of rows that matched the criteria
+        $totalrows = count($tableList);
+
+        return $totalrows;
     }
 }

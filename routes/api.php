@@ -57,5 +57,5 @@ Route::group(['middleware' => ['cors', 'json.response','validateAPIKey']], funct
     Route::get('/show-record',[DatatableController::class, 'showRecord'])->name('show-record.api');
     Route::post('/update-datatable',[DatatableController::class, 'update'])->name('update-datatable.api');
     Route::post('/insert-datatable',[DatatableController::class, 'insert'])->name('insert-datatable.api');
-
+    Route::get('/list-datatable',[DatatableController::class, 'tabledata'])->name('list-datatable.api');
 });
