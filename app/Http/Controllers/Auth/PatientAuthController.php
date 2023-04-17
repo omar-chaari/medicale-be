@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Patient;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 
@@ -22,7 +23,7 @@ class PatientAuthController extends Controller
             'last_name' => 'required|string|max:255|min:3',
             'country' => '',
             'phone'=> 'required|string|max:255|min:3',
-            'email' => 'required|string|email|max:255|unique:users',
+            'email' => 'required|string|email|max:255|unique:patients',
             'password' => 'required|string|min:6|confirmed',
             
             'address' => 'required|string|max:255|min:3',
@@ -36,9 +37,15 @@ class PatientAuthController extends Controller
        
         $request['password']=Hash::make($request['password']);
         $request['remember_token'] = Str::random(10);
+
         $user = Patient::create($request->toArray());
         $token = $user->createToken('Laravel Password Grant Client')->accessToken;
         $response = ['token' => $token];
+        
+        if ($request['verification'] == 1) {
+
+            $this->emailVerifPatient($request);
+        }
         return response($response, 200);
     }
     
@@ -88,6 +95,20 @@ class PatientAuthController extends Controller
         $token->revoke();
         $response = ['message' => 'You have been successfully logged out!'];
         return response($response, 200);
+    }
+
+    public function emailVerifPatient($data)
+    {
+
+        $details = [
+            'first_name' => $data->first_name,
+            'last_name' => $data->last_name,
+            'email' => $data->email,
+            'phone' => $data->phone,
+
+        ];
+
+        Mail::to($data->email)->send(new \App\Notifications\InscriptionPatient($details));
     }
     
 

@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Datatable;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Models\Patient;
+
 use Illuminate\Http\Request;
 
 
@@ -82,10 +84,16 @@ class DatatableController extends Controller
             //commit transaction
             DB::commit();
 
+            //
             if ($cmd === "email_verif_professional") {
                 $professional = User::find($data["keys"]["id"]);
 
                 $this->emailVerifProfessional($professional);
+            }
+            if ($cmd === "email_verif_patient") {
+                $professional = Patient::find($data["keys"]["id"]);
+
+                $this->emailVerifPatient($professional);
             }
             return ['status' => true, 'message' => 'Data modified successfully.'];
         } catch (\Exception $e) {
@@ -192,6 +200,22 @@ class DatatableController extends Controller
 
         Mail::to($data->email)->send(new \App\Notifications\Contact($details));
     }
+
+    public function emailVerifPatient($data)
+    {
+
+        $details = [
+            'first_name' => $data->first_name,
+            'last_name' => $data->last_name,
+
+            'email' => $data->email,
+            'phone' => $data->phone,
+
+        ];
+
+        Mail::to($data->email)->send(new \App\Notifications\ContactPatient($details));
+    }
+
 
     public function showRecord(Request $request)
     {
