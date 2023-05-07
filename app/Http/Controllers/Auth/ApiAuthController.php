@@ -85,10 +85,13 @@ class ApiAuthController extends Controller
 
             $user = User::where('email', $request->email)->first();
 
+            $token= $user->createToken("API TOKEN")->plainTextToken;
+            $user->api_key = $token;
+            $user->save();
             return response()->json([
                 'status' => true,
                 'message' => 'User Logged In Successfully',
-                'token' => $user->createToken("API TOKEN")->plainTextToken
+                'token' => $token
             ], 200);
         } catch (\Throwable $th) {
             return response()->json([

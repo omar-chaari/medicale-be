@@ -5,6 +5,8 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use App\Models\Admin;
+use App\Models\Patient;
+
 use Illuminate\Support\Facades\Log;
 
 class ValidateAPIKey
@@ -21,10 +23,13 @@ class ValidateAPIKey
         $authorizationHeader = $request->header('Authorization');
         $apiKey = str_replace('Bearer ', '', $authorizationHeader);
         
-        Log::info("apikey=$apiKey");
 
         
-        if (!$apiKey || !Admin::where('api_key', $apiKey)->exists()) {
+        if (!$apiKey || (!Admin::where('api_key', $apiKey)->exists()
+        && !Patient::where('api_key', $apiKey)->exists()
+        
+        )
+        ) {
             return response()->json(['error' => 'Invalid API Key'], 401);
         }
         return $next($request);
