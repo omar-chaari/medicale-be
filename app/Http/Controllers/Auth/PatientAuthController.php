@@ -84,7 +84,10 @@ class PatientAuthController extends Controller
                 'status' => true,
                 'message' => 'User Logged In Successfully',
                 'token' => $token,
-                'user_id'=>$user->id
+                'user_id'=>$user->id,
+                'first_name'=>$user->first_name,
+                'last_name'=>$user->last_name
+
             ], 200);
 
         } catch (\Throwable $th) {
