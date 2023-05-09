@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Datatable;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\Patient;
+use App\Models\Appointment;
 
 use Illuminate\Http\Request;
 
@@ -151,12 +152,13 @@ class DatatableController extends Controller
     {
         $table = $request->table;
         $data = (array) $request->data;
+        $cmd = $request->cmd ? $request->cmd : "";
 
-        return   $this->processInsert($table, $data);
+        return   $this->processInsert($table, $data , $cmd);
     }
 
 
-    private function processInsert(string $table, array $data)
+    private function processInsert(string $table, array $data, string $cmd)
     {
 
 
@@ -173,6 +175,25 @@ class DatatableController extends Controller
         try {
             $query = "INSERT INTO $table SET $sql;";
             DB::insert($query);
+          
+            
+            if ($cmd === "email_rdv_patient") {
+               
+                $appointement=[];
+                $appointement["date"]=date("d-m-Y H:s", strtotime($data["form_data"]["date_debut"]));
+                $appointement["motif_consultation"]=$data["form_data"]["motif_consultation"];
+
+
+                $patient = Patient::find($data["form_data"]["patient"]);
+                $professional = Patient::find($data["form_data"]["patient"]);
+                $appointement["professional"]=$professional->first_name. " ".$professional->last_name;
+                $appointement["patient"]=$patient->first_name. " ".$patient->last_name;
+                $appointement["email_professional"]=$professional->email;
+                $appointement["patient_tel"]=$patient->phone;
+
+                $this->emailRdvPatient($appointement);
+            }
+
             return ['status' => true, 'message' => 'Data modified successfully.'];
         } catch (\Illuminate\Database\QueryException $ex) {
             $error_message = $ex->getMessage();
@@ -214,6 +235,23 @@ class DatatableController extends Controller
         ];
 
         Mail::to($data->email)->send(new \App\Notifications\ContactPatient($details));
+    }
+    public function emailRdvPatient($data)
+    {
+
+        $details = [
+         
+            'professional' => $data["professional"],
+            'patient' => $data["patient"],
+            'date' => $data["date"],
+            'motif_consultation' => $data["motif_consultation"],
+            'patient_tel' => $data["patient_tel"],
+
+            //'email_professional' => $data["email_patient"]
+
+        ];
+
+        Mail::to( $data["email_professional"])->send(new \App\Notifications\RdvPatient($details));
     }
 
 

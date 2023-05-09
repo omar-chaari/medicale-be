@@ -8,4 +8,13 @@ use Illuminate\Database\Eloquent\Model;
 class Appointment extends Model
 {
     use HasFactory;
+
+    public function professionalslist()
+	{
+		return $this->belongsTo('App\Models\Professional', 'users', 'id');
+	}
+    public function patientslist()
+	{
+		return $this->belongsTo('App\Models\Patient', 'patients', 'id');
+	}
 }
