@@ -185,7 +185,7 @@ class DatatableController extends Controller
 
 
                 $patient = Patient::find($data["form_data"]["patient"]);
-                $professional = Patient::find($data["form_data"]["patient"]);
+                $professional = User::find($data["form_data"]["professional"]);
                 $appointement["professional"]=$professional->first_name. " ".$professional->last_name;
                 $appointement["patient"]=$patient->first_name. " ".$patient->last_name;
                 $appointement["email_professional"]=$professional->email;
@@ -194,7 +194,7 @@ class DatatableController extends Controller
                 $this->emailRdvPatient($appointement);
             }
 
-            return ['status' => true, 'message' => 'Data modified successfully.'];
+            return ['status' => true, 'message' => 'Data inserted successfully.'];
         } catch (\Illuminate\Database\QueryException $ex) {
             $error_message = $ex->getMessage();
             $pos = strpos($error_message, "Duplicate entry");
@@ -247,7 +247,6 @@ class DatatableController extends Controller
             'motif_consultation' => $data["motif_consultation"],
             'patient_tel' => $data["patient_tel"],
 
-            //'email_professional' => $data["email_patient"]
 
         ];
 
