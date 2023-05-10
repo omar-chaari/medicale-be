@@ -11,7 +11,7 @@ class SearchAppointementController extends Controller
 {
     //
 
-  
+
 
     public function searchAppointement(Request $request)
     {
@@ -21,9 +21,11 @@ class SearchAppointementController extends Controller
         $patient = $request->patient ? $request->patient : "";
         $sortColumn = $request->sortColumn ? $request->sortColumn : "date_debut";
         $sortOrder = $request->sortOrder ? $request->sortOrder : "desc";
+        $current_date = $request->current_date ? $request->current_date : "";
 
-        $result = $this->getTableListAppointement($offset, $limit, $order_by, $patient,$sortColumn, $sortOrder);
-        $totalItems = $this->getTotalItemsAppointement($patient);
+
+        $result = $this->getTableListAppointement($offset, $limit, $order_by, $patient, $current_date, $sortColumn, $sortOrder);
+        $totalItems = $this->getTotalItemsAppointement($patient, $current_date);
         $response = array(
             "data" => $result,
             "totalItems" => $totalItems,
@@ -32,12 +34,12 @@ class SearchAppointementController extends Controller
 
         return response($response, 200);
     }
-    function getTableListAppointement($offset = 0, $limit = -1, $order_by, $patient , $sortColumn, $sortOrder)
+    function getTableListAppointement($offset = 0, $limit = -1, $order_by, $patient, $current_date, $sortColumn, $sortOrder)
     {
 
 
 
- 
+
 
 
         $users = DB::table('appointements')
@@ -49,18 +51,16 @@ class SearchAppointementController extends Controller
                 'users.last_name',
                 'users.id'
 
-               
+
             )
 
             ->leftJoin('users', 'users.id', '=', 'appointements.professional')
 
 
 
-            ->where(function ($q) use ($patient ) {
-                $q->where('appointements.patient', '=', $patient);
-
-
-                    
+            ->where(function ($q) use ($patient, $current_date) {
+                $q->where('appointements.patient', '=', $patient)
+                    ->where('appointements.date_debut', '>=', $current_date);
             })
 
             ->offset($offset)
@@ -71,22 +71,22 @@ class SearchAppointementController extends Controller
         return $users;
     }
 
-    function getTotalItemsAppointement($patient)
+    function getTotalItemsAppointement($patient,$current_date)
     {
 
 
         $users = DB::table('appointements')
             ->leftJoin('users', 'users.id', '=', 'appointements.professional')
-            
-            ->where(function ($q) use ( $patient) {
+
+            ->where(function ($q) use ($patient,$current_date) {
                 $q->where('appointements.patient', '=', $patient)
-                   
-                   ;
+                ->where('appointements.date_debut', '>=', $current_date);
+
+               
             })
             ->get();
         $totalrows = count($users);
 
         return $totalrows;
     }
-
 }
