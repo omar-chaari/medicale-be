@@ -49,8 +49,8 @@ class SearchAppointementController extends Controller
                 'state',
                 'users.first_name',
                 'users.last_name',
-                'users.id'
-
+                'users.id as professional_id',
+                'appointements.id as appointement_id',
 
             )
 
