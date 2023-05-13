@@ -91,7 +91,11 @@ class ApiAuthController extends Controller
             return response()->json([
                 'status' => true,
                 'message' => 'User Logged In Successfully',
-                'token' => $token
+                'token' => $token,
+                'user_id'=>$user->id,
+                'first_name'=>$user->first_name,
+                'last_name'=>$user->last_name
+
             ], 200);
         } catch (\Throwable $th) {
             return response()->json([

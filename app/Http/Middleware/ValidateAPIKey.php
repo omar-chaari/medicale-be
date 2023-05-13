@@ -6,6 +6,7 @@ use Closure;
 use Illuminate\Http\Request;
 use App\Models\Admin;
 use App\Models\Patient;
+use App\Models\User;
 
 use Illuminate\Support\Facades\Log;
 
@@ -27,6 +28,7 @@ class ValidateAPIKey
         
         if (!$apiKey || (!Admin::where('api_key', $apiKey)->exists()
         && !Patient::where('api_key', $apiKey)->exists()
+        && !User::where('api_key', $apiKey)->exists()
         
         )
         ) {

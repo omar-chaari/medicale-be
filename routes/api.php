@@ -8,8 +8,9 @@ use App\Http\Controllers\Search\SearchController;
 use App\Http\Controllers\Datatable\DatatableController;
 use App\Http\Controllers\Auth\PatientAuthController;
 use App\Http\Controllers\DocumentController;
-use App\Http\Controllers\Search\searchAppointementController;
+use App\Http\Controllers\Search\SearchAppointementController;
 
+use App\Http\Controllers\Search\SearchAppointementProController;
 
 
 
@@ -55,7 +56,9 @@ Route::group(['middleware' => ['cors', 'json.response','validateAPIKey']], funct
     Route::get('/get-pro',[SearchController::class, 'getMedecin'])->name('get-pro.api');
 
 
-    Route::get('/search-appointement',[searchAppointementController::class, 'searchAppointement'])->name('searchmedecin.api');
+    Route::get('/search-appointement',[searchAppointementController::class, 'searchAppointement'])->name('search-appointement.api');
+
+    Route::get('/search-appointement-pro',[SearchAppointementProController::class, 'searchAppointement'])->name('search-appointement-pro.api');
 
     
     //
