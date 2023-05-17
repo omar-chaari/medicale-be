@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 
 use DB;
 
-class SearchAppointementProController extends Controller
+class AppointementProCalendrierController extends Controller
 {
     //
 
@@ -46,10 +46,11 @@ class SearchAppointementProController extends Controller
         $users = DB::table('appointements')
             ->select(
                 'date_debut',
+                'date_fin',
                 'motif_consultation',
                 'state',
                 'patients.first_name as first_name_patient',
-                'patients.last_name as last_name_patient ',
+                'patients.last_name as last_name_patient',
                 'users.id as professional_id',
                 'appointements.id as appointement_id',
 
@@ -68,8 +69,6 @@ class SearchAppointementProController extends Controller
                     $q->where('appointements.date_debut', '<=', $date_fin);
             })
 
-            ->offset($offset)
-            ->limit($limit)
             ->orderBy($sortColumn, $sortOrder)
             ->get();
 

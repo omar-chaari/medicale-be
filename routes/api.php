@@ -12,7 +12,7 @@ use App\Http\Controllers\Search\SearchAppointementController;
 
 use App\Http\Controllers\Search\SearchAppointementProController;
 
-
+use App\Http\Controllers\Search\AppointementProCalendrierController;
 
 
 
@@ -59,6 +59,8 @@ Route::group(['middleware' => ['cors', 'json.response','validateAPIKey']], funct
     Route::get('/search-appointement',[searchAppointementController::class, 'searchAppointement'])->name('search-appointement.api');
 
     Route::get('/search-appointement-pro',[SearchAppointementProController::class, 'searchAppointement'])->name('search-appointement-pro.api');
+
+    Route::get('/appointement-calendrier',[AppointementProCalendrierController::class, 'searchAppointement'])->name('appointement-calendrier.api');
 
     
     //

@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Datatable;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\Patient;
-use App\Models\Appointment;
+use App\Models\Appointement;
 
 use Illuminate\Http\Request;
 
@@ -50,6 +50,7 @@ class DatatableController extends Controller
             $where = implode(" AND ", $key_where);
 
 
+            
             $sql = "";
             foreach ($data["form_data"] as $key => $value) {
                 if ($sql != "")
@@ -90,12 +91,33 @@ class DatatableController extends Controller
                 $professional = User::find($data["keys"]["id"]);
 
                 $this->emailVerifProfessional($professional);
-            }
-            if ($cmd === "email_verif_patient") {
+            } else if ($cmd === "email_verif_patient") {
                 $professional = Patient::find($data["keys"]["id"]);
 
                 $this->emailVerifPatient($professional);
+            } else if ($cmd === "email_confirm_rdv" || $cmd === "email_report_rdv") {
+
+                ////////////////////
+
+
+                $appointement_record = Appointement::find($data["keys"]["id"]);
+                $appointement = [];
+                $appointement["date"] = date("d-m-Y", strtotime($appointement_record->date_debut));
+                $appointement["heure"] = date("H:s", strtotime($appointement_record->date_debut));
+                $patient = Patient::find($appointement_record->patient);
+                $professional = User::find($appointement_record->professional);
+                $appointement["pro_name"] = $professional->first_name . " " . $professional->last_name;
+                $appointement["patient_name"] = $patient->first_name . " " . $patient->last_name;
+                $appointement["email_patient"] = $patient->email;
+
+
+                if ($cmd === "email_confirm_rdv")
+                    $this->emailConfirmRdv($appointement);
+                else if ($cmd === "email_report_rdv")
+                    $this->emailReportRdv($appointement);
             }
+
+
             return ['status' => true, 'message' => 'Data modified successfully.'];
         } catch (\Exception $e) {
             DB::rollback();
@@ -154,7 +176,7 @@ class DatatableController extends Controller
         $data = (array) $request->data;
         $cmd = $request->cmd ? $request->cmd : "";
 
-        return   $this->processInsert($table, $data , $cmd);
+        return   $this->processInsert($table, $data, $cmd);
     }
 
 
@@ -175,24 +197,41 @@ class DatatableController extends Controller
         try {
             $query = "INSERT INTO $table SET $sql;";
             DB::insert($query);
-          
-            
+
+
             if ($cmd === "email_rdv_patient") {
-               
-                $appointement=[];
-                $appointement["date"]=date("d-m-Y H:s", strtotime($data["form_data"]["date_debut"]));
-                $appointement["motif_consultation"]=$data["form_data"]["motif_consultation"];
+
+                $appointement = [];
+                $appointement["date"] = date("d-m-Y H:s", strtotime($data["form_data"]["date_debut"]));
+                $appointement["motif_consultation"] = $data["form_data"]["motif_consultation"];
 
 
                 $patient = Patient::find($data["form_data"]["patient"]);
                 $professional = User::find($data["form_data"]["professional"]);
-                $appointement["professional"]=$professional->first_name. " ".$professional->last_name;
-                $appointement["patient"]=$patient->first_name. " ".$patient->last_name;
-                $appointement["email_professional"]=$professional->email;
-                $appointement["patient_tel"]=$patient->phone;
+                $appointement["professional"] = $professional->first_name . " " . $professional->last_name;
+                $appointement["patient"] = $patient->first_name . " " . $patient->last_name;
+                $appointement["email_professional"] = $professional->email;
+                $appointement["patient_tel"] = $patient->phone;
 
                 $this->emailRdvPatient($appointement);
             }
+            else if ($cmd === "email_nouveau_rdv") {
+
+                $appointement = [];
+                $appointement["date"] = date("d-m-Y H:s", strtotime($data["form_data"]["date_debut"]));
+
+
+                $patient = Patient::find($data["form_data"]["patient"]);
+                $professional = User::find($data["form_data"]["professional"]);
+                $appointement["pro_name"] = $professional->first_name . " " . $professional->last_name;
+                $appointement["patient_name"] = $patient->first_name . " " . $patient->last_name;
+                $appointement["pro_adresse"] = $professional->address;
+                $appointement["patient_email"] = $patient->email;
+
+                $appointement["pro_spec"] = $professional->specialitylist->speciality;
+                $this->emailNouvauRdv($appointement);
+            }
+
 
             return ['status' => true, 'message' => 'Data inserted successfully.'];
         } catch (\Illuminate\Database\QueryException $ex) {
@@ -222,6 +261,9 @@ class DatatableController extends Controller
         Mail::to($data->email)->send(new \App\Notifications\Contact($details));
     }
 
+
+
+
     public function emailVerifPatient($data)
     {
 
@@ -240,7 +282,7 @@ class DatatableController extends Controller
     {
 
         $details = [
-         
+
             'professional' => $data["professional"],
             'patient' => $data["patient"],
             'date' => $data["date"],
@@ -250,8 +292,57 @@ class DatatableController extends Controller
 
         ];
 
-        Mail::to( $data["email_professional"])->send(new \App\Notifications\RdvPatient($details));
+        Mail::to($data["email_professional"])->send(new \App\Notifications\RdvPatient($details));
     }
+
+    
+
+    public function emailNouvauRdv($data)
+    {
+
+        $details = [
+
+            'pro_name' => $data["pro_name"],
+            'patient_name' => $data["patient_name"],
+            'date' => $data["date"],
+            'pro_adresse' => $data["pro_adresse"],
+            'pro_spec' => $data["pro_spec"],
+        ];
+
+        Mail::to($data["patient_email"])->send(new \App\Notifications\NouveauRdv($details));
+    }
+
+    public function emailConfirmRdv($data)
+    {
+
+
+        $details = [
+
+            'patient_name' => $data["patient_name"],
+            'pro_name' => $data["pro_name"],
+            'date' => $data["date"],
+            'heure' => $data["heure"]
+
+        ];
+
+        Mail::to($data["email_patient"])->send(new \App\Notifications\ConfirmRdv($details));
+    }
+
+    public function emailReportRdv($data)
+    {
+
+        $details = [
+
+            'patient_name' => $data["patient_name"],
+            'pro_name' => $data["pro_name"],
+            'date' => $data["date"],
+            'heure' => $data["heure"]
+
+        ];
+        Mail::to($data["email_patient"])->send(new \App\Notifications\ReportRdv($details));
+    }
+
+
 
 
     public function showRecord(Request $request)
