@@ -120,5 +120,44 @@ class PatientAuthController extends Controller
     }
     
 
+    public function change_password(Request $request)
+    {
+        // Validate the inputs
+        $request->validate([
+            'current_password' => ['required', 'string'],
+            'new_password' => ['required', 'string', 'min:6', 'confirmed'],
+        ]);
+
+        $user = Patient::where('id', $request->id)->first();
+
+        // Check if current password matches with the password in the database
+        if (!Hash::check($request->current_password, $user->password)) {
+            return response()->json(['error' => 'Current password does not match'], 422);
+        }
+
+        // Hash the new password and save it to the database
+        $user->password = Hash::make($request->new_password);
+        $user->save();
+
+        return response()->json(['message' => 'Password changed successfully'], 200);
+    }
+
+    public function change_password_admin(Request $request)
+    {
+        // Validate the inputs
+        $request->validate([
+            'new_password' => ['required', 'string', 'min:6'],
+        ]);
+
+        $user = Patient::where('id', $request->id)->first();
+
+
+      
+        // Hash the new password and save it to the database
+        $user->password = Hash::make($request->new_password);
+        $user->save();
+
+        return response()->json(['message' => 'Password changed successfully'], 200);
+    }
 
 }

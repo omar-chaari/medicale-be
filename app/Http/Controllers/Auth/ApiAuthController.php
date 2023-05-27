@@ -41,7 +41,7 @@ class ApiAuthController extends Controller
         $request['password'] = Hash::make($request['password']);
         $request['remember_token'] = Str::random(10);
 
-        if (!isset($request['verification']  ))
+        if (!isset($request['verification']))
             $request['verification'] = 0;
 
         $user = User::create($request->toArray());
@@ -85,16 +85,16 @@ class ApiAuthController extends Controller
 
             $user = User::where('email', $request->email)->first();
 
-            $token= $user->createToken("API TOKEN")->plainTextToken;
+            $token = $user->createToken("API TOKEN")->plainTextToken;
             $user->api_key = $token;
             $user->save();
             return response()->json([
                 'status' => true,
                 'message' => 'User Logged In Successfully',
                 'token' => $token,
-                'user_id'=>$user->id,
-                'first_name'=>$user->first_name,
-                'last_name'=>$user->last_name
+                'user_id' => $user->id,
+                'first_name' => $user->first_name,
+                'last_name' => $user->last_name
 
             ], 200);
         } catch (\Throwable $th) {
@@ -125,5 +125,46 @@ class ApiAuthController extends Controller
         ];
 
         Mail::to($data->email)->send(new \App\Notifications\Inscription($details));
+    }
+    public function change_password(Request $request)
+    {
+        // Validate the inputs
+        $request->validate([
+            'current_password' => ['required', 'string'],
+            'new_password' => ['required', 'string', 'min:6', 'confirmed'],
+        ]);
+
+        $user = User::where('id', $request->id)->first();
+
+        // Check if current password matches with the password in the database
+        if (!Hash::check($request->current_password, $user->password)) {
+            return response()->json(['error' => 'Current password does not match'], 422);
+        }
+
+        // Hash the new password and save it to the database
+        $user->password = Hash::make($request->new_password);
+        $user->save();
+
+        return response()->json(['message' => 'Password changed successfully'], 200);
+    }
+
+    public function change_password_admin(Request $request)
+    {
+        // Validate the inputs
+        $request->validate([
+            'new_password' => ['required', 'string', 'min:6' ],
+        ]);
+
+        $user = User::where('id', $request->id)->first();
+
+
+     
+       
+        
+        // Hash the new password and save it to the database
+        $user->password = Hash::make($request->new_password);
+        $user->save();
+
+        return response()->json(['message' => 'Password changed successfully'], 200);
     }
 }

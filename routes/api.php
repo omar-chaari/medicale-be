@@ -36,36 +36,38 @@ Route::group(['middleware' => ['cors', 'json.response']], function () {
     // ...
 
     Route::post('/login',   [ApiAuthController::class, 'login'])->name('login.api');
-    Route::post('/register',[ApiAuthController::class, 'register'])->name('register.api');
-    Route::get('/search',[SearchController::class, 'search'])->name('search.api');
+    Route::post('/register', [ApiAuthController::class, 'register'])->name('register.api');
+    Route::get('/search', [SearchController::class, 'search'])->name('search.api');
 
-    Route::get('/search-medecin',[SearchController::class, 'searchMedecin'])->name('searchmedecin.api');
+    Route::get('/search-medecin', [SearchController::class, 'searchMedecin'])->name('searchmedecin.api');
 
     Route::post('/login-admin',   [AdminAuthController::class, 'login'])->name('login-admin.api');
     //Route::post('/register-admin',[AdminAuthController::class, 'register'])->name('register-admin.api');
     Route::post('/login-patient',   [PatientAuthController::class, 'login'])->name('login-patient.api');
-    Route::post('/register-patient',[PatientAuthController::class, 'register'])->name('register-patient.api');
-
-
+    Route::post('/register-patient', [PatientAuthController::class, 'register'])->name('register-patient.api');
 });
 
-Route::group(['middleware' => ['cors', 'json.response','validateAPIKey']], function () {
-    Route::delete('/delete-datatable',[DatatableController::class, 'delete'])->name('delete-datatable.api');
-    Route::post('/document-store',[DocumentController::class, 'documentStore'])->name('document-store.api');
+Route::group(['middleware' => ['cors', 'json.response', 'validateAPIKey']], function () {
+    Route::delete('/delete-datatable', [DatatableController::class, 'delete'])->name('delete-datatable.api');
+    Route::post('/document-store', [DocumentController::class, 'documentStore'])->name('document-store.api');
 
-    Route::get('/get-pro',[SearchController::class, 'getMedecin'])->name('get-pro.api');
+    Route::get('/get-pro', [SearchController::class, 'getMedecin'])->name('get-pro.api');
+
+    Route::get('/search-appointement', [searchAppointementController::class, 'searchAppointement'])->name('search-appointement.api');
+    Route::get('/search-appointement-pro', [SearchAppointementProController::class, 'searchAppointement'])->name('search-appointement-pro.api');
+    Route::get('/appointement-calendrier', [AppointementProCalendrierController::class, 'searchAppointement'])->name('appointement-calendrier.api');
 
 
-    Route::get('/search-appointement',[searchAppointementController::class, 'searchAppointement'])->name('search-appointement.api');
 
-    Route::get('/search-appointement-pro',[SearchAppointementProController::class, 'searchAppointement'])->name('search-appointement-pro.api');
 
-    Route::get('/appointement-calendrier',[AppointementProCalendrierController::class, 'searchAppointement'])->name('appointement-calendrier.api');
+    Route::post('/change-password-pro-admin',   [ApiAuthController::class, 'change_password_admin'])->name('change_password_pro_admin.api');
+    Route::post('/change-password-pro',   [ApiAuthController::class, 'change_password'])->name('change_password_pro.api');
+    Route::post('/change-password-patient-admin',   [PatientAuthController::class, 'change_password_admin'])->name('change_password_patient_admin.api');
+    Route::post('/change-password-patient',   [PatientAuthController::class, 'change_password'])->name('change_password_patient.api');
 
-    
     //
-    Route::get('/show-record',[DatatableController::class, 'showRecord'])->name('show-record.api');
-    Route::post('/update-datatable',[DatatableController::class, 'update'])->name('update-datatable.api');
-    Route::post('/insert-datatable',[DatatableController::class, 'insert'])->name('insert-datatable.api');
-    Route::get('/list-datatable',[DatatableController::class, 'tabledata'])->name('list-datatable.api');
+    Route::get('/show-record', [DatatableController::class, 'showRecord'])->name('show-record.api');
+    Route::post('/update-datatable', [DatatableController::class, 'update'])->name('update-datatable.api');
+    Route::post('/insert-datatable', [DatatableController::class, 'insert'])->name('insert-datatable.api');
+    Route::get('/list-datatable', [DatatableController::class, 'tabledata'])->name('list-datatable.api');
 });
