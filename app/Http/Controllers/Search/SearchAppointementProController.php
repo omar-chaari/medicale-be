@@ -49,7 +49,7 @@ class SearchAppointementProController extends Controller
                 'motif_consultation',
                 'state',
                 'patients.first_name as first_name_patient',
-                'patients.last_name as last_name_patient ',
+                'patients.last_name as last_name_patient',
                 'users.id as professional_id',
                 'appointements.id as appointement_id',
 
