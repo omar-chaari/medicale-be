@@ -45,6 +45,8 @@ Route::group(['middleware' => ['cors', 'json.response']], function () {
     //Route::post('/register-admin',[AdminAuthController::class, 'register'])->name('register-admin.api');
     Route::post('/login-patient',   [PatientAuthController::class, 'login'])->name('login-patient.api');
     Route::post('/register-patient', [PatientAuthController::class, 'register'])->name('register-patient.api');
+    Route::get('/patient/activation/{token}', [PatientAuthController::class, 'activateAccount'])->name('patient.activation');
+
 });
 
 Route::group(['middleware' => ['cors', 'json.response', 'validateAPIKey']], function () {

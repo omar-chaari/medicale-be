@@ -5,61 +5,68 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Patient;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
-
+use \App\Notifications\ActivationEmail;
 
 class PatientAuthController extends Controller
 {
     //
 
-    public function register (Request $request) {
-        
+    public function register(Request $request)
+    {
+
         $validator = Validator::make($request->all(), [
             'first_name' => 'required|string|max:255|min:3',
             'last_name' => 'required|string|max:255|min:3',
             'country' => '',
-            'phone'=> 'required|string|max:255|min:3',
+            'phone' => 'required|string|max:255|min:3',
             'email' => 'required|string|email|max:255|unique:patients',
             'password' => 'required|string|min:6|confirmed',
-            
+
             'address' => 'required|string|max:255|min:3',
-            
+
         ]);
-        if ($validator->fails())
-        {
-            return response(['errors'=>$validator->errors()->all()], 422);
+        if ($validator->fails()) {
+            return response(['errors' => $validator->errors()->all()], 422);
         }
-        
-       
-        $request['password']=Hash::make($request['password']);
+
+
+        $request['password'] = Hash::make($request['password']);
         $request['remember_token'] = Str::random(10);
+
+        $request['activation_token'] = Str::random(60);
+        $request['activation_token_expires_at'] = Carbon::now()->addDay();
 
         $user = Patient::create($request->toArray());
         $token = $user->createToken('Laravel Password Grant Client')->accessToken;
         $response = ['token' => $token];
-        
+
         if ($request['verification'] == 1) {
 
             $this->emailVerifPatient($request);
         }
+        $this->sendActivationEmail($request['activation_token'], $request['email'] );
         return response($response, 200);
     }
-    
+
 
     public function login(Request $request)
     {
         try {
-            $validateUser = Validator::make($request->all(), 
-            [
-                'email' => 'required|email',
-                'password' => 'required'
-            ]);
+            $validateUser = Validator::make(
+                $request->all(),
+                [
+                    'email' => 'required|email',
+                    'password' => 'required'
+                ]
+            );
 
-            if($validateUser->fails()){
+            if ($validateUser->fails()) {
                 return response()->json([
                     'status' => false,
                     'message' => 'validation error',
@@ -67,16 +74,23 @@ class PatientAuthController extends Controller
                 ], 401);
             }
 
-            if(!Auth::guard('patients')->attempt($request->only(['email', 'password']))){
+            if (!Auth::guard('patients')->attempt($request->only(['email', 'password']))) {
                 return response()->json([
                     'status' => false,
-                    'message' => 'Email & Password does not match with our record.',
+                    'message' => 'Email ou mot de passe invalide. Veuillez réessayer.',
                 ], 401);
             }
 
             $user = Patient::where('email', $request->email)->first();
 
-            $token= $user->createToken("API TOKEN")->plainTextToken;
+            if ($user->verification != 1) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Utilisateur non actif. Veuillez cliquer sur le lien d\'activation envoyé par e-mail.'
+                ], 401);
+            }
+    
+            $token = $user->createToken("API TOKEN")->plainTextToken;
             $user->api_key = $token;
             $user->save();
 
@@ -84,12 +98,11 @@ class PatientAuthController extends Controller
                 'status' => true,
                 'message' => 'User Logged In Successfully',
                 'token' => $token,
-                'user_id'=>$user->id,
-                'first_name'=>$user->first_name,
-                'last_name'=>$user->last_name
+                'user_id' => $user->id,
+                'first_name' => $user->first_name,
+                'last_name' => $user->last_name
 
             ], 200);
-
         } catch (\Throwable $th) {
             return response()->json([
                 'status' => false,
@@ -98,7 +111,8 @@ class PatientAuthController extends Controller
         }
     }
 
-    public function logout (Request $request) {
+    public function logout(Request $request)
+    {
         $token = $request->user()->token();
         $token->revoke();
         $response = ['message' => 'You have been successfully logged out!'];
@@ -118,7 +132,7 @@ class PatientAuthController extends Controller
 
         Mail::to($data->email)->send(new \App\Notifications\InscriptionPatient($details));
     }
-    
+
 
     public function change_password(Request $request)
     {
@@ -152,12 +166,63 @@ class PatientAuthController extends Controller
         $user = Patient::where('id', $request->id)->first();
 
 
-      
+
         // Hash the new password and save it to the database
         $user->password = Hash::make($request->new_password);
         $user->save();
 
         return response()->json(['message' => 'Password changed successfully'], 200);
     }
+    public function activateAccount($token)
+    {
+        $user = Patient::where('activation_token', $token)->first();
 
+        if (!$user) {
+       
+            /** Cas:
+             * Le lien d\'activation est invalide.
+            */
+            return response()->json(['error' => 'Le lien d\'activation est invalide.'], 404);
+
+        }
+
+        if ($user->verification==1) {
+       
+            return response()->json(['message' => 'Votre compte est déjà activé.'], 200);
+
+        }
+
+        if (Carbon::now()->gt($user->activation_token_expires_at)) {
+            
+            
+            /** Cas:
+             * Le lien d\'activation a expiré.
+            */
+      
+            return response()->json([['error' => 'Le lien d\'activation a expiré.']], 400);
+
+        }
+
+        $user->verification = 1;
+        $user->save();
+        return response()->json(['message' => 'Votre compte est activé avec succés.'], 200);
+
+    }
+
+
+    public function sendActivationEmail(String $token, String $email)
+    {
+        $data = [
+            'token' => $token,
+        ];
+
+        /*Mail::send('emails.activate', $data, function ($message) use ($user) {
+            $message->to($user->email)->subject('Activation de compte');
+        });
+      */
+    
+
+        Mail::to($email)->send(new \App\Notifications\ActivationEmail($data));
+
+           }
 }

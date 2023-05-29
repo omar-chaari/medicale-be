@@ -50,7 +50,7 @@ class DatatableController extends Controller
             $where = implode(" AND ", $key_where);
 
 
-            
+
             $sql = "";
             foreach ($data["form_data"] as $key => $value) {
                 if ($sql != "")
@@ -214,8 +214,7 @@ class DatatableController extends Controller
                 $appointement["patient_tel"] = $patient->phone;
 
                 $this->emailRdvPatient($appointement);
-            }
-            else if ($cmd === "email_nouveau_rdv") {
+            } else if ($cmd === "email_nouveau_rdv") {
 
                 $appointement = [];
                 $appointement["date"] = date("d-m-Y H:s", strtotime($data["form_data"]["date_debut"]));
@@ -295,7 +294,7 @@ class DatatableController extends Controller
         Mail::to($data["email_professional"])->send(new \App\Notifications\RdvPatient($details));
     }
 
-    
+
 
     public function emailNouvauRdv($data)
     {
@@ -449,4 +448,5 @@ class DatatableController extends Controller
 
         return $totalrows;
     }
+  
 }

@@ -28,7 +28,9 @@ class Patient extends Authenticatable
         'address',
         'birthday',
         'indicatif_phone',
-        'sexe'
+        'sexe',
+         'activation_token',
+         'activation_token_expires_at'
    ];
 
     /**
