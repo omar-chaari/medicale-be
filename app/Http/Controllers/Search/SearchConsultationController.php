@@ -33,36 +33,53 @@ class SearchConsultationController extends Controller
 
         return response($response, 200);
     }
-    function getTableListConsultation($offset = 0, $limit = -1, $order_by, $patient,  $sortColumn, $sortOrder)
-    {
 
-     
-        $users = DB::table('consultations')
+    function getTableListConsultation($offset = 0, $limit = -1, $order_by, $patient, $sortColumn, $sortOrder)
+    {
+        $consultations = DB::table('consultations')
             ->select(
-                'date',
+                'consultations.id as consultation_id',
+                'consultations.date',
                 'motif',
                 'notes',
                 'users.first_name',
                 'users.last_name',
                 'users.id as professional_id',
-                'consultations.id as consultation_id',
+                'documents.id as document_id',
+                'documents.fichier as fichier',
+                'documents.description',
             )
-
             ->leftJoin('users', 'users.id', '=', 'consultations.professional')
-            
-
-
-            ->where(function ($q) use ($patient) {
-                $q->where('consultations.patient', '=', $patient) ;
-            })
-
+            ->leftJoin('documents', 'documents.consultation', '=', 'consultations.id')
+            ->where('consultations.patient', '=', $patient)
             ->offset($offset)
             ->limit($limit)
             ->orderBy($sortColumn, $sortOrder)
             ->get();
 
-        return $users;
+        // Group the consultations by their IDs and collect the documents
+        $consultationData = collect($consultations)->groupBy('consultation_id')->map(function ($groupedConsultations) {
+            $consultation = $groupedConsultations->first();
+
+
+            // Extract the document information for each consultation
+            $documents = $groupedConsultations->map(function ($item) {
+                            return $item->document_id !== null;
+
+                return [
+                    'document_id' => $item->document_id,
+                    'fichier' => $item->fichier,
+                    'description' => $item->description,
+                ];
+            })->all();
+
+            $consultation->documents = $documents;
+            return $consultation;
+        });
+
+        return $consultationData;
     }
+
 
     function getTotalItemsConsultation($patient)
     {
@@ -73,8 +90,6 @@ class SearchConsultationController extends Controller
 
             ->where(function ($q) use ($patient) {
                 $q->where('consultations.patient', '=', $patient);
-
-               
             })
             ->get();
         $totalrows = count($users);
