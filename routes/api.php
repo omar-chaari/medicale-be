@@ -10,6 +10,7 @@ use App\Http\Controllers\Auth\PatientAuthController;
 use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\ConsultationController;
 use App\Http\Controllers\Search\SearchAppointementController;
+use App\Http\Controllers\Search\SearchConsultationController;
 
 use App\Http\Controllers\Search\SearchAppointementProController;
 
@@ -58,7 +59,9 @@ Route::group(['middleware' => ['cors', 'json.response', 'validateAPIKey']], func
 
     
     Route::get('/get-pro', [SearchController::class, 'getMedecin'])->name('get-pro.api');
+    Route::get('/search-consulatation', [SearchConsultationController::class, 'searchConsultation'])->name('search-consulatation.api');
 
+    
     Route::get('/search-appointement', [searchAppointementController::class, 'searchAppointement'])->name('search-appointement.api');
     Route::get('/search-appointement-pro', [SearchAppointementProController::class, 'searchAppointement'])->name('search-appointement-pro.api');
     Route::get('/appointement-calendrier', [AppointementProCalendrierController::class, 'searchAppointement'])->name('appointement-calendrier.api');
