@@ -8,6 +8,7 @@ use App\Http\Controllers\Search\SearchController;
 use App\Http\Controllers\Datatable\DatatableController;
 use App\Http\Controllers\Auth\PatientAuthController;
 use App\Http\Controllers\DocumentController;
+use App\Http\Controllers\ConsultationController;
 use App\Http\Controllers\Search\SearchAppointementController;
 
 use App\Http\Controllers\Search\SearchAppointementProController;
@@ -53,6 +54,9 @@ Route::group(['middleware' => ['cors', 'json.response', 'validateAPIKey']], func
     Route::delete('/delete-datatable', [DatatableController::class, 'delete'])->name('delete-datatable.api');
     Route::post('/document-store', [DocumentController::class, 'documentStore'])->name('document-store.api');
 
+    Route::post('/consultation-store', [ConsultationController::class, 'store'])->name('consultation-store.api');
+
+    
     Route::get('/get-pro', [SearchController::class, 'getMedecin'])->name('get-pro.api');
 
     Route::get('/search-appointement', [searchAppointementController::class, 'searchAppointement'])->name('search-appointement.api');

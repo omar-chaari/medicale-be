@@ -17,13 +17,13 @@ class DocumentController extends Controller
        
         $image_path = $request->file('fichier')->store('fichier', 'public');
 
-        $patient=$request->patient;
+        $consultation=$request->consultation;
         $description=$request->description;
 
 
         $data = Document::create([
             'fichier' => $image_path,
-            'patient' => $patient,
+            'consultation' => $consultation,
             'description' => $description,
         ]);
 

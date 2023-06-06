@@ -199,6 +199,7 @@ class DatatableController extends Controller
             DB::insert($query);
 
 
+
             if ($cmd === "email_rdv_patient") {
 
                 $appointement = [];
