@@ -61,11 +61,10 @@ class SearchConsultationController extends Controller
         $consultationData = collect($consultations)->groupBy('consultation_id')->map(function ($groupedConsultations) {
             $consultation = $groupedConsultations->first();
 
-
-            // Extract the document information for each consultation
-            $documents = $groupedConsultations->map(function ($item) {
-                            return $item->document_id !== null;
-
+            // Filter out consultations without documents
+            $documents = $groupedConsultations->filter(function ($item) {
+                return $item->document_id !== null;
+            })->map(function ($item) {
                 return [
                     'document_id' => $item->document_id,
                     'fichier' => $item->fichier,
