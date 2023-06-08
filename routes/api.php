@@ -55,6 +55,8 @@ Route::group(['middleware' => ['cors', 'json.response']], function () {
 Route::group(['middleware' => ['cors', 'json.response', 'validateAPIKey']], function () {
     Route::delete('/delete-datatable', [DatatableController::class, 'delete'])->name('delete-datatable.api');
     Route::post('/document-store', [DocumentController::class, 'documentStore'])->name('document-store.api');
+    
+    Route::delete('/document-delete', [DocumentController::class, 'documentDelete'])->name('document-delete.api');
 
     Route::post('/consultation-store', [ConsultationController::class, 'store'])->name('consultation-store.api');
 
