@@ -16,6 +16,7 @@ use App\Http\Controllers\Search\SearchAppointementProController;
 
 use App\Http\Controllers\Search\AppointementProCalendrierController;
 
+use Illuminate\Http\Response;
 
 
 /*
@@ -48,7 +49,7 @@ Route::group(['middleware' => ['cors', 'json.response']], function () {
     Route::post('/login-patient',   [PatientAuthController::class, 'login'])->name('login-patient.api');
     Route::post('/register-patient', [PatientAuthController::class, 'register'])->name('register-patient.api');
     Route::get('/patient/activation/{token}', [PatientAuthController::class, 'activateAccount'])->name('patient.activation');
-
+  
 });
 
 Route::group(['middleware' => ['cors', 'json.response', 'validateAPIKey']], function () {
@@ -79,4 +80,33 @@ Route::group(['middleware' => ['cors', 'json.response', 'validateAPIKey']], func
     Route::post('/update-datatable', [DatatableController::class, 'update'])->name('update-datatable.api');
     Route::post('/insert-datatable', [DatatableController::class, 'insert'])->name('insert-datatable.api');
     Route::get('/list-datatable', [DatatableController::class, 'tabledata'])->name('list-datatable.api');
+
+ 
+
+    
+});
+
+
+
+
+Route::group(['middleware' => ['image.auth']], function () {
+   
+
+    Route::get('/images/{filename}', function ($filename) {
+        $path = storage_path('app/public/fichier/' . $filename);
+    
+        if (file_exists($path)) {
+            $response = new Response(file_get_contents($path), 200);
+
+            $response->header('Content-Type', mime_content_type($path));
+            $response->header('Access-Control-Allow-Origin', '*');
+            $response->header('Access-Control-Allow-Methods', 'GET');
+    
+            return $response;
+    
+        } else {
+            abort(404, 'Image not found');
+        }
+    
+    });
 });
