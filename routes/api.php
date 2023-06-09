@@ -60,6 +60,10 @@ Route::group(['middleware' => ['cors', 'json.response', 'validateAPIKey']], func
 
     Route::post('/consultation-store', [ConsultationController::class, 'store'])->name('consultation-store.api');
 
+
+    Route::delete('/consultation-delete', [ConsultationController::class, 'delete'])->name('consultation-delete.api');
+
+    
     
     Route::get('/get-pro', [SearchController::class, 'getMedecin'])->name('get-pro.api');
     Route::get('/search-consulatation', [SearchConsultationController::class, 'searchConsultation'])->name('search-consulatation.api');

@@ -19,4 +19,11 @@ patient	professional	date	motif	notes
         'motif',
         'notes'
     ];
+
+    public function documents()
+    {
+        return $this->hasMany(Document::class, 'consultation');
+    }
+    
+
 }

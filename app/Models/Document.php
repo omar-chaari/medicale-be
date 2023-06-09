@@ -15,4 +15,10 @@ class Document extends Model
 
        
     ];
+
+    public function consultation()
+    {
+        return $this->belongsTo(Consultation::class, 'consultation');
+    }
+
 }
