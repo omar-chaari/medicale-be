@@ -17,7 +17,7 @@ return new class extends Migration
         Schema::table('documents', function (Blueprint $table) {
         // Suppression de la clé étrangère patient
        // $table->dropForeign(['patient']);
-        $table->dropColumn('patient');
+        //$table->dropColumn('patient');
 
         // Création d'une nouvelle clé étrangère consultation
        // $table->unsignedBigInteger('consultation');
