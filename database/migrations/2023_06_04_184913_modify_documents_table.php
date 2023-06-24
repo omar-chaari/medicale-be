@@ -20,7 +20,7 @@ return new class extends Migration
         //$table->dropColumn('patient');
 
         // Création d'une nouvelle clé étrangère consultation
-       // $table->unsignedBigInteger('consultation');
+        $table->unsignedBigInteger('consultation');
         $table->foreign('consultation')->references('id')->on('consultations');    });
 
     }
