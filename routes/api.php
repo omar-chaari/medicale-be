@@ -93,8 +93,6 @@ Route::group(['middleware' => ['cors', 'json.response', 'validateAPIKey']], func
 });
 
 
-
-
 Route::group(['middleware' => ['image.auth']], function () {
    
 
