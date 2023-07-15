@@ -109,7 +109,7 @@ Route::group(['middleware' => ['image.auth']], function () {
             return $response;
     
         } else {
-            abort(404, 'Image not found');
+            abort(404, 'Image not found in the server');
         }
     
     });
